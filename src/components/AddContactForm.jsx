@@ -1,17 +1,27 @@
 // src/components/AddContactForm.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { addContact, getAllContacts } from "../services/contactService";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 
 const AddContactForm = ({ onClose }) => {
-  const { dispatch } = useGlobalReducer();
+  const { store, dispatch } = useGlobalReducer();
   const [form, setForm] = useState({
     name: "",
     phone: "",
     email: "",
     address: ""
   });
-
+  useEffect(()=>{
+   if(store.selectedContact != null){
+    setForm({ 
+    name: store.selectedContact.name,
+    phone: store.selectedContact.phone,
+    email: store.selectedContact.email,
+    address: store.selectedContact.address
+  }
+  );
+   }
+  },[]);
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };

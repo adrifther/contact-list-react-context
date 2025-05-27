@@ -3,7 +3,7 @@ import React from "react";
 import { deleteContact } from "../services/contactService";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 
-const ContactCard = ({ contact }) => {
+const ContactCard = ({ contact, onOpen }) => {
   const { dispatch } = useGlobalReducer();
 
   const handleDelete = async () => {
@@ -15,6 +15,10 @@ const ContactCard = ({ contact }) => {
         console.error("Error deleting contact:", err);
       }
     }
+  };
+    const handleEdit = async () =>  {
+        dispatch({ type: "select_contact", payload: contact });
+        onOpen();  
   };
 
   return (
@@ -31,7 +35,7 @@ const ContactCard = ({ contact }) => {
           <strong>📍 Address:</strong> {contact.address}
         </p>
         <div className="d-flex justify-content-end">
-          <button className="btn btn-outline-primary btn-sm me-2">Edit</button>
+          <button className="btn btn-outline-primary btn-sm me-2" onClick={handleEdit}>Edit</button>
           <button className="btn btn-outline-danger btn-sm" onClick={handleDelete}>Delete</button>
         </div>
       </div>

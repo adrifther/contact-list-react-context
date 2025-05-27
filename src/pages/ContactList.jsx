@@ -20,7 +20,7 @@ const ContactList = () => {
     };
 
     fetchContacts();
-  }, [dispatch]);
+  }, []);
 
   return (
     <div className="container py-4">
@@ -34,7 +34,7 @@ const ContactList = () => {
       <div className="row">
         {store.contacts?.map((contact) => (
           <div className="col-md-6 col-lg-4 mb-3" key={contact.id}>
-            <ContactCard contact={contact} />
+            <ContactCard onOpen={() => setShowModal(true)} contact={contact} />
           </div>
         ))}
       </div>
