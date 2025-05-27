@@ -1,32 +1,36 @@
-export const initialStore=()=>{
-  return{
-    message: null,
-    todos: [
-      {
-        id: 1,
-        title: "Make the bed",
-        background: null,
-      },
-      {
-        id: 2,
-        title: "Do my homework",
-        background: null,
-      }
-    ]
-  }
-}
+// src/store.js
 
-export default function storeReducer(store, action = {}) {
-  switch(action.type){
-    case 'add_task':
+export const initialStore = () => ({
+  contacts: [],            // Lista de contactos obtenidos de la API
+  selectedContact: null,   // Contacto seleccionado para edición (opcional)
+});
 
-      const { id,  color } = action.payload
+export default function storeReducer(state, action = {}) {
+  switch (action.type) {
+    case "set_contacts":
+      return { ...state, contacts: action.payload };
 
+    case "add_contact":
+      return { ...state, contacts: [...state.contacts, action.payload] };
+
+    case "delete_contact":
       return {
-        ...store,
-        todos: store.todos.map((todo) => (todo.id === id ? { ...todo, background: color } : todo))
+        ...state,
+        contacts: state.contacts.filter(c => c.id !== action.payload),
       };
+
+    case "update_contact":
+      return {
+        ...state,
+        contacts: state.contacts.map(c =>
+          c.id === action.payload.id ? action.payload : c
+        ),
+      };
+
+    case "select_contact":
+      return { ...state, selectedContact: action.payload };
+
     default:
-      throw Error('Unknown action.');
-  }    
+      throw new Error("Unknown action type: " + action.type);
+  }
 }
