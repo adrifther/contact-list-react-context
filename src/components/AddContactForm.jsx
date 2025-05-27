@@ -1,6 +1,6 @@
 // src/components/AddContactForm.jsx
 import React, { useState } from "react";
-import { addContact } from "../services/contactService";
+import { addContact, getAllContacts } from "../services/contactService";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 
 const AddContactForm = ({ onClose }) => {
@@ -16,82 +16,59 @@ const AddContactForm = ({ onClose }) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        const newContact = await addContact(form); // <-- no necesita poner agenda_slug aquí
-        dispatch({ type: "add_contact", payload: newContact });
-        onClose();
+      // 1) Creas el contacto
+      await addContact(form);
+
+      // 2) Recargas toda la lista desde la API
+      const refreshed = await getAllContacts();
+
+      // 3) Actualizas el global store
+      dispatch({ type: "set_contacts", payload: refreshed });
+
+      // 4) Cierras el modal
+      onClose();
     } catch (err) {
-        console.error("Error adding contact:", err);
+      console.error("Error adding contact:", err);
     }
-    };
+  };
 
   return (
-    <div className="modal fade show d-block" tabIndex="-1" role="dialog">
-      <div className="modal-dialog" role="document">
-        <div className="modal-content">
+    <div className="modal fade show d-block" tabIndex="-1">
+      <div className="modal-dialog">
+        <form className="modal-content" onSubmit={handleSubmit}>
           <div className="modal-header">
             <h5 className="modal-title">Add New Contact</h5>
-            <button type="button" className="btn-close" onClick={onClose}></button>
+            <button type="button" className="btn-close" onClick={onClose} />
           </div>
-          <form onSubmit={handleSubmit}>
-            <div className="modal-body">
-              <div className="mb-3">
-                <label className="form-label">Full Name</label>
+          <div className="modal-body">
+            {["name","phone","email","address"].map((field) => (
+              <div className="mb-3" key={field}>
+                <label className="form-label">
+                  {field === "name" ? "Full Name" : field.charAt(0).toUpperCase()+field.slice(1)}
+                </label>
                 <input
-                  type="text"
-                  className="form-control"
-                  name="name"
-                  value={form.name}
+                  name={field}
+                  value={form[field]}
                   onChange={handleChange}
+                  type={field==="email"?"email":"text"}
+                  className="form-control"
                   required
                 />
               </div>
-              <div className="mb-3">
-                <label className="form-label">Phone</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="phone"
-                  value={form.phone}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Email</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Address</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="address"
-                  value={form.address}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={onClose}>
-                Cancel
-              </button>
-              <button type="submit" className="btn btn-primary">
-                Save Contact
-              </button>
-            </div>
-          </form>
-        </div>
+            ))}
+          </div>
+          <div className="modal-footer">
+            <button type="button" className="btn btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary">
+              Save Contact
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
