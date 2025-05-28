@@ -1,7 +1,7 @@
-
+// src/components/ContactForm.jsx
 import React, { useState, useEffect } from "react";
 
-const ContactForm = ({ initialData = {}, onSubmit, onCancel }) => {
+const ContactForm = ({ initialData, onSubmit, onCancel }) => {
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -12,9 +12,9 @@ const ContactForm = ({ initialData = {}, onSubmit, onCancel }) => {
   useEffect(() => {
     if (initialData) {
       setForm({
-        name: initialData.name || "",
-        email: initialData.email || "",
-        phone: initialData.phone || "",
+        name:    initialData.name    || "",
+        email:   initialData.email   || "",
+        phone:   initialData.phone   || "",
         address: initialData.address || "",
       });
     }
